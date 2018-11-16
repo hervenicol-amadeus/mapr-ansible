@@ -26,7 +26,7 @@
     dest=/opt/mapr/conf/env_override.sh
     line="export MAPR_HBASE_SERVER_OPTS=\"${HYBRID_LOGIN_OPTS} ${MAPR_SSL_OPTS} -Dmapr.library.flatclass\""
     regexp="^export MAPR_HBASE_SERVER_OPTS"
-    mode=0755
+    mode=0644
     create=yes
     owner="{{ mapr_user }}"
     group="{{ mapr_group }}"
@@ -42,9 +42,19 @@
 - name: Copy to /opt/mapr/conf/conf.d/warden.hbasethrift.conf
   copy: remote_src=true src="/opt/mapr/hbase/hbase-{{ version_output.stdout }}/conf/warden.hbasethrift.conf" dest=/opt/mapr/conf/conf.d/warden.hbasethrift.conf mode=0644 owner="{{ mapr_user }}" group="{{ mapr_group }}"
   changed_when: false
-- name: Replace ${VERSION} with Hbase version
+- name: Replace ${VERSION} with Hbase version in warden.hbasethrift.conf
   shell: 'sed -i s/\${VERSION}/`cat /opt/mapr/hbase/hbaseversion`/g /opt/mapr/conf/conf.d/warden.hbasethrift.conf'
   changed_when: false
+  args:
+    warn: no
+- name: Copy to /opt/mapr/conf/conf.d/warden.hbaserest.conf
+  copy: remote_src=true src="/opt/mapr/hbase/hbase-{{ version_output.stdout }}/conf/warden.hbaserest.conf" dest=/opt/mapr/conf/conf.d/warden.hbaserest.conf mode=0644 owner="{{ mapr_user }}" group="{{ mapr_group }}"
+  changed_when: false
+- name: Replace ${VERSION} with Hbase version in warden.hbaserest.conf
+  shell: 'sed -i s/\${VERSION}/`cat /opt/mapr/hbase/hbaseversion`/g /opt/mapr/conf/conf.d/warden.hbaserest.conf'
+  changed_when: false
+  args:
+    warn: no
 - pause: seconds=10
   when: hbaserest_result.changed or hbasethrift_result.changed
 - name: Restart HBase Rest Server
