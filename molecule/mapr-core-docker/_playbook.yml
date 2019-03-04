@@ -76,5 +76,4 @@
   become: true
   roles:
     - ../roles/mapr-configure-warden-cldb-restart
-      #    - ../roles/amadeus-mapr-configure-yarn-siteall
-
+    #    - ../roles/amadeus-mapr-configure-yarn-siteall

@@ -20,9 +20,9 @@ platforms:
       - apparmor=unconfined
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-        #    tmpfs:
-        #      - /tmp
-        #      - /run
+      #    tmpfs:
+      #      - /tmp
+      #      - /run
     groups:
       - common
       - mapr-core

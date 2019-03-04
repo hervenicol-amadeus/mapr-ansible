@@ -18,7 +18,7 @@
     num_mysql_hosts: "{{ groups['ext-mysql']|length }}"
   roles:
     - ../../roles/mapr-hive-vars
-    - { role: ../../roles/mapr-hive-mysql, when: hive_db_type == 'mysql' and hive_db_mysql_create_schema_and_user and num_mysql_hosts != '0' }
+    - {role: ../../roles/mapr-hive-mysql, when: hive_db_type == 'mysql' and hive_db_mysql_create_schema_and_user and num_mysql_hosts != '0'}
 - name: Install Hive CLI
   hosts: all
   become: true
@@ -55,8 +55,8 @@
 #    roles:
 #    - ../../roles/mapr-hive-cli-uninstall
 
-#- import_playbook: ../../sites/mapr-mep-spark.yml
-  
+# - import_playbook: ../../sites/mapr-mep-spark.yml
+
 - name: Install Spark on YARN
   hosts: all
   become: true
@@ -98,7 +98,7 @@
   vars:
     num_mysql_hosts: "{{ groups['ext-mysql']|length }}"
   roles:
-    - { role: ../../roles/mapr-oozie-mysql, when: oozie_db_type == 'mysql' and oozie_db_mysql_create_schema_and_user and num_mysql_hosts != '0' }
+    - {role: ../../roles/mapr-oozie-mysql, when: oozie_db_type == 'mysql' and oozie_db_mysql_create_schema_and_user and num_mysql_hosts != '0'}
 - name: Install Oozie
   hosts: all
   become: true
@@ -108,4 +108,3 @@
 #    hosts: all:!mapr-oozie
 #    roles:
 #    - ../../roles/mapr-oozie-uninstall
-
