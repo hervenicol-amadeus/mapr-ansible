@@ -1,4 +1,4 @@
-import os,json
+import os,json,re
 
 import testinfra.utils.ansible_runner
 
@@ -124,8 +124,9 @@ def test_yarn_config_with_kerberos(host):
 def test_hadoop_fs(host):
     cmd = host.run("echo mapr | maprlogin password -user mapr")
     assert "MapR credentials of user 'mapr' for cluster 'molecule-cluster' are written to" in cmd.stdout
-    cmd = host.run("hadoop fs -ls /")
-    assert "Found 6 items" in cmd.stdout
+    cmd = host.run("hadoop fs -ls -d /user/mapr")
+    cmd_dir_pattern = re.compile(ur'(drwx.*mapr mapr.*/user/mapr)')
+    assert re.findall(cmd_dir_pattern, cmd.stdout)
 
 def helper_test_yarn_application(host):
     apps = host.run("curl -u mapr:mapr --cacert /opt/mapr/conf/ssl_truststore.pem -X GET -H \"Content-Type:application/json\" https://basic-core:8090/ws/v1/cluster/apps")

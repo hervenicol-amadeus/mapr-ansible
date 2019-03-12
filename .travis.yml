@@ -27,7 +27,5 @@ script:
      retr0h/molecule:latest
      sudo molecule test -s mapr-core-docker
 
-
-
 matrix:
   fast_finish: true

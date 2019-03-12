@@ -132,7 +132,7 @@
       changed_when: false
     - name: Replace in yarn-site.xml
       replace:
-        dest: "/opt/mapr/hadoop/hadoop-{{ version_output.stdout }}/etc/hadoop/yarn-site.xml"           
+        dest: "/opt/mapr/hadoop/hadoop-{{ version_output.stdout }}/etc/hadoop/yarn-site.xml"
         regexp: '<property>\n(\s+)<name>yarn.admin.acl</name>\n(\s+)<value> </value>\n(\s+)</property>'
         replace: ''
         backup: true
