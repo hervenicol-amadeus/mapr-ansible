@@ -20,9 +20,6 @@ platforms:
       - apparmor=unconfined
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      #    tmpfs:
-      #      - /tmp
-      #      - /run
     groups:
       - common
       - mapr-core
@@ -32,9 +29,6 @@ platforms:
       - mapr-mcs
       - mapr-spark-historyserver
       - mapr-hbase-cli
-      - mapr-hive-cli
-      - mapr-hive-metastore
-      - mapr-hive-server2
       - mapr-oozie
       - mapr-historyserver
       - mapr-resourcemanager

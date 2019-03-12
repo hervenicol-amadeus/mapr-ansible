@@ -1,4 +1,4 @@
-import os
+import os,json
 
 import testinfra.utils.ansible_runner
 
@@ -13,10 +13,17 @@ def test_mapr_installed_packages(host):
         "mapr-fileserver",
         "mapr-resourcemanager",
         "mapr-historyserver",
-        "mapr-webserver",
         "mapr-nodemanager",
         "mapr-core",
-        "mapr-core-internal"
+        "mapr-core-internal",
+        "mapr-mapreduce2",
+        "mapr-zk-internal",
+        "mapr-spark",
+        "mapr-oozie",
+        "mapr-librdkafka",
+        "mapr-hadoop-core",
+        "mapr-spark-historyserver",
+        "mapr-oozie-internal"
     ]:
         assert host.package(p).is_installed
 
@@ -59,8 +66,7 @@ def test_yarn_config_with_kerberos(host):
     vars = host.ansible.get_variables()
     f = host.file("/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/yarn-site.xml")
     assert f.exists
-    assert """
-  <property>
+    assert """<property>
     <name>yarn.resourcemanager.ha.custom-ha-enabled</name>
     <value>true</value>
     <description>MapR Zookeeper based RM Reconnect Enabled. If this is true, set the failover proxy to be the class MapRZKBasedRMFailoverProxyProvider</description>
@@ -84,10 +90,7 @@ def test_yarn_config_with_kerberos(host):
     <name>yarn.acl.enable</name>
     <value>true</value>
   </property>
-  <property>
-    <name>yarn.admin.acl</name>
-    <value> </value>
-  </property>
+  
 
   <!-- :::CAUTION::: DO NOT EDIT ANYTHING ON OR ABOVE THIS LINE -->
     <!-- fix for Oozie when user different than mapr -->
@@ -116,42 +119,16 @@ def test_yarn_config_with_kerberos(host):
         <name>yarn.resourcemanager.am.max-attempts</name>
         <value>4</value>
         <description>The maximum number of application attempts</description>
-    </property>
-            <property>
-        <name>yarn.nodemanager.aux-services</name>
-        <value>mapreduce_shuffle,mapr_direct_shuffle,spark_shuffle</value>
-        <description>shuffle service that needs to be set for Map Reduce to run</description>
-    </property>
-    <property>
-        <name>yarn.nodemanager.aux-services.spark_shuffle.class</name>
-        <value>org.apache.spark.network.yarn.YarnShuffleService</value>
-    </property>
-    <property>
-        <name>spark.shuffle.service.port</name>
-        <value>7337</value>
-        <description>Port on which the external shuffle service will run.</description>
-    </property>
-        <property>
-        <name>spark.authenticate</name>
-        <value>true</value>
-        <description>Whether Spark authenticates its internal connections.</description>
-    </property>
-        <property>
-        <name>spark.yarn.shuffle.stopOnFailure</name>
-        <value>false</value>
-        <description>Whether to stop the NodeManager when there's a failure in the Spark Shuffle Service's initialization.
-            This prevents application failures caused by running containers on NodeManagers where the Spark Shuffle Service is not running.
-        </description>
     </property>""" in f.content
 
 def test_hadoop_fs(host):
-    cmd = host.run("echo rootpass | maprlogin password")
-    assert "MapR credentials of user 'root' for cluster 'demo.mapr.com' are written to" in cmd.stdout
+    cmd = host.run("echo mapr | maprlogin password -user mapr")
+    assert "MapR credentials of user 'mapr' for cluster 'molecule-cluster' are written to" in cmd.stdout
     cmd = host.run("hadoop fs -ls /")
-    assert "Found 5 items" in cmd.stdout
+    assert "Found 6 items" in cmd.stdout
 
 def helper_test_yarn_application(host):
-    pps = host.run("curl -u root:rootpass --cacert /opt/mapr/conf/ssl_truststore.pem -X GET -H \"Content-Type:application/json\" https://molecule-cluster:8090/ws/v1/cluster/apps")
+    apps = host.run("curl -u mapr:mapr --cacert /opt/mapr/conf/ssl_truststore.pem -X GET -H \"Content-Type:application/json\" https://basic-core:8090/ws/v1/cluster/apps")
     state = sorted(json.loads(apps.stdout)['apps']['app'], key=lambda k: k['startedTime'], reverse=True)[0]['finalStatus']
     assert state == "SUCCEEDED"
 

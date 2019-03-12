@@ -36,6 +36,23 @@
         - /root/storagefile3
       when: not storagefile1.stat.exists and not storagefile2.stat.exists and not storagefile3.stat.exists
 
+- name: check storagefiles access rights
+  hosts: all
+  become: true
+  tasks:
+    - name: root dir access
+      file:
+        path: /root
+        mode: 0755
+    - name: storage files access
+      file:
+        path: "{{ item }}"
+        mode: 0666
+      with_items:
+        - /root/storagefile1
+        - /root/storagefile2
+        - /root/storagefile3
+
 - import_playbook: common.yml
 - import_playbook: mapr-precheck.yml
 - import_playbook: mapr-repository.yml
@@ -103,4 +120,20 @@
   become: true
   roles:
     - ../../../roles/mapr-configure-warden-cldb-restart
-#    - ../../roles/amadeus-mapr-configure-yarn-site
+
+- name: Set yarn admin user
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Get version
+      command: cat /opt/mapr/hadoop/hadoopversion
+      register: version_output
+      changed_when: false
+    - name: Replace in yarn-site.xml
+      replace:
+        dest: "/opt/mapr/hadoop/hadoop-{{ version_output.stdout }}/etc/hadoop/yarn-site.xml"           
+        regexp: '<property>\n(\s+)<name>yarn.admin.acl</name>\n(\s+)<value> </value>\n(\s+)</property>'
+        replace: ''
+        backup: true
+      when: version_output.rc == 0

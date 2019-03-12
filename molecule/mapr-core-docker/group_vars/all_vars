@@ -38,7 +38,7 @@ yarn_log_aggregation: False
 yarn_max_container_allocation_in_mb: 131072
 # Create local dir for NodeManager temporary data like shuffle and sort. This requires mapr-nfs on the same node!
 yarn_local_dir_to_maprfs: False
-yarn_spark_shuffle: True
+yarn_spark_shuffle: False
 
 # If set value will be overriden
 #drill_max_proc_mem_in_mb: 20
